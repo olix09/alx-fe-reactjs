@@ -1,16 +1,14 @@
 // src/components/recipeStore.js
-import { create } from 'zustand';
+import create from 'zustand';
 
 const useRecipeStore = create((set) => ({
+  // Main recipe list
   recipes: [],
-  filteredRecipes: [],
+
+  // Filtered/search-related state
   searchTerm: '',
-
-  // ✅ Setters
-  setRecipes: (newRecipes) => set({ recipes: newRecipes, filteredRecipes: newRecipes }),
+  filteredRecipes: [],
   setSearchTerm: (term) => set({ searchTerm: term }),
-
-  // ✅ Update filteredRecipes based on searchTerm
   filterRecipes: () =>
     set((state) => ({
       filteredRecipes: state.recipes.filter((recipe) =>
@@ -18,16 +16,25 @@ const useRecipeStore = create((set) => ({
       ),
     })),
 
-  // Optional: update recipe
-  updateRecipe: (id, updatedData) =>
+  // ✅ Add favorites
+  favorites: [],
+  addFavorite: (recipe) =>
     set((state) => ({
-      recipes: state.recipes.map((r) =>
-        r.id === id ? { ...r, ...updatedData } : r
-      ),
-      filteredRecipes: state.filteredRecipes.map((r) =>
-        r.id === id ? { ...r, ...updatedData } : r
-      ),
+      favorites: [...state.favorites, recipe],
     })),
+  removeFavorite: (id) =>
+    set((state) => ({
+      favorites: state.favorites.filter((recipe) => recipe.id !== id),
+    })),
+
+  // ✅ Add recommendations (dummy for now)
+  recommendations: [
+    { id: 'rec-1', title: 'Recommended Pancakes' },
+    { id: 'rec-2', title: 'Recommended Pasta' },
+  ],
+
+  // Optional: set full recipe list
+  setRecipes: (recipes) => set({ recipes, filteredRecipes: recipes }),
 }));
 
 export default useRecipeStore;
