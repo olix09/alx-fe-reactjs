@@ -1,46 +1,33 @@
 // src/components/recipeStore.js
-import create from 'zustand';
+import { create } from 'zustand';
 
 const useRecipeStore = create((set) => ({
   recipes: [],
-  favorites: [],
-  recommendations: [],
+  filteredRecipes: [],
+  searchTerm: '',
 
-  // REQUIRED by ALX checker
-  setRecipes: (newRecipes) => set(() => ({ recipes: newRecipes })),
+  // ✅ Setters
+  setRecipes: (newRecipes) => set({ recipes: newRecipes, filteredRecipes: newRecipes }),
+  setSearchTerm: (term) => set({ searchTerm: term }),
 
-  addRecipe: (recipe) => set((state) => ({
-    recipes: [...state.recipes, recipe],
-  })),
-
-  updateRecipe: (updatedRecipe) => set((state) => ({
-    recipes: state.recipes.map((r) =>
-      r.id === updatedRecipe.id ? updatedRecipe : r
-    ),
-  })),
-
-  deleteRecipe: (id) => set((state) => ({
-    recipes: state.recipes.filter((r) => r.id !== id),
-  })),
-
-  addFavorite: (recipeId) =>
+  // ✅ Update filteredRecipes based on searchTerm
+  filterRecipes: () =>
     set((state) => ({
-      favorites: [...state.favorites, recipeId],
+      filteredRecipes: state.recipes.filter((recipe) =>
+        recipe.title.toLowerCase().includes(state.searchTerm.toLowerCase())
+      ),
     })),
 
-  removeFavorite: (recipeId) =>
+  // Optional: update recipe
+  updateRecipe: (id, updatedData) =>
     set((state) => ({
-      favorites: state.favorites.filter((id) => id !== recipeId),
+      recipes: state.recipes.map((r) =>
+        r.id === id ? { ...r, ...updatedData } : r
+      ),
+      filteredRecipes: state.filteredRecipes.map((r) =>
+        r.id === id ? { ...r, ...updatedData } : r
+      ),
     })),
-
-  generateRecommendations: () =>
-    set((state) => {
-      const recommended = state.recipes.filter(
-        (recipe) =>
-          state.favorites.includes(recipe.id) && Math.random() > 0.3
-      );
-      return { recommendations: recommended };
-    }),
 }));
 
 export default useRecipeStore;
